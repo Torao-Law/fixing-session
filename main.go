@@ -47,10 +47,6 @@ func main() {
 	// Create new Echo instance
 	e := echo.New()
 
-	// Middleware, logger for logging, recover is handling when it's panic
-	// e.Use(middleware.Logger())
-	// e.Use(middleware.Recover())
-
 	// Serve static files from "/public" directory
 	e.Static("/public", "public")
 
@@ -73,7 +69,7 @@ func main() {
 	e.GET("/form-login", formLogin)
 	e.POST("/login", login)
 
-	e.POST("/logout", logout)
+	e.GET("/logout", logout)
 
 	// Start server
 	println("Server running on port 5000")
@@ -88,12 +84,13 @@ func home(c echo.Context) error {
 	sess, _ := session.Get("session", c)
 
 	flash := map[string]interface{}{
-		"FlashStatus":  sess.Values["status"],
+		"FlashStatus":  sess.Values["isLogin"],
 		"FlashMessage": sess.Values["message"],
+		"FlashName":    sess.Values["name"],
 	}
 
 	delete(sess.Values, "message")
-	delete(sess.Values, "status")
+	delete(sess.Values, "alertStatus")
 	sess.Save(c.Request(), c.Response())
 
 	var tmpl, err = template.ParseFiles("views/index.html")
@@ -256,12 +253,12 @@ func formLogin(c echo.Context) error {
 	sess, _ := session.Get("session", c)
 
 	flash := map[string]interface{}{
-		"FlashStatus":  sess.Values["status"],
+		"FlashStatus":  sess.Values["alsetStatus"],
 		"FlashMessage": sess.Values["message"],
 	}
 
 	delete(sess.Values, "message")
-	delete(sess.Values, "status")
+	delete(sess.Values, "alertStatus")
 	sess.Save(c.Request(), c.Response())
 
 	var tmpl, err = template.ParseFiles("views/form-login.html")
@@ -295,7 +292,7 @@ func login(c echo.Context) error {
 	sess, _ := session.Get("session", c)
 	sess.Options.MaxAge = 10800 // 3 JAM
 	sess.Values["message"] = "Login success!"
-	sess.Values["status"] = true
+	sess.Values["alertStatus"] = true
 	sess.Values["name"] = user.Name
 	sess.Values["email"] = user.Email
 	sess.Values["id"] = user.ID
@@ -316,7 +313,7 @@ func logout(c echo.Context) error {
 func redirectWithMessage(c echo.Context, message string, status bool, path string) error {
 	sess, _ := session.Get("session", c)
 	sess.Values["message"] = message
-	sess.Values["status"] = status
+	sess.Values["alertStatus"] = status
 	sess.Save(c.Request(), c.Response())
 	return c.Redirect(http.StatusMovedPermanently, path)
 }

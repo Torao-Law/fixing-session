@@ -25,19 +25,14 @@
       </ul>
     </div>
 
-
     <div class="right-side">
-
       {{if .DataSession.IsLogin}}
-      <a href="#">Hallo, {{.DataSession.Name}}</a>
-      <form id="myform" action="/logout" method="POST">
-      </form>
-      <button onclick="document.getElementById('myform').submit()" class="btn-auth">Logout</button>
+        <a href="#">Hallo, {{.DataSession.Name}}</a>
+        <a href="/logout" class="btn-auth">Logout</a>
       {{else}}
-      <a href="/form-register" class="btn-auth">Register</a>
-      <a href="/form-login" class="btn-auth">Login</a>
+        <a href="/form-register" class="btn-auth">Register</a>
+        <a href="/form-login" class="btn-auth">Login</a>
       {{end}}
-
       <a href="/contact" class="btn-contact"> Contact Me </a>
     </div>
   </nav>
